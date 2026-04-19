@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Controle de Capoeira</title>
+<style>
+body{background:#0f6b63;color:#fff;font-family:Arial;margin:0}
+.container{max-width:1100px;margin:auto;padding:20px}
+.card{background:#141414;padding:12px;border-radius:10px;margin-bottom:6px}
+.form-box{max-height:0;overflow:hidden;transition:.3s}
+.form-box.ativo{max-height:600px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+input{padding:10px;border:none;border-radius:5px;width:100%;box-sizing:border-box}
+.form-full{grid-column:span 2}
+button{padding:6px;border:none;border-radius:5px;cursor:pointer;font-size:12px}
+.btn{background:#00c853;color:#fff}
+.btn-danger{background:#ff5252;color:#fff}
+.btn-warning{background:#ff9800;color:#fff}
+.aluno{border:1px solid #333;border-radius:10px;padding:8px;margin-bottom:6px}
+.aluno h3{margin:0;cursor:pointer;font-size:15px}
+.parcelas{max-height:70vh;overflow-y:auto;transition:.3s}
+.parcelas.ativo{padding-top:5px}
+.parcela{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:14px}
+.parcela-botoes{display:flex;gap:4px;flex-wrap:wrap}
+.dashboard{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.box{background:#1b1b1b;padding:10px;border-radius:10px;text-align:center}
+.fab{position:fixed;bottom:20px;right:20px;width:60px;height:60px;border-radius:50%;background:#25D366;color:#fff;font-size:30px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+#toast{position:fixed;top:20px;right:20px;background:#333;padding:10px;border-radius:8px;display:none}
+
+#topoMensalidade{
+position:sticky;
+top:0;
+background:#141414;
+z-index:5;
+transition:transform .3s;
+padding-top:5px;
+}
+#topoMensalidade.esconder{transform:translateY(-100%)}
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<div class="container">
+<div id="sistema">
+<h2>🥋 Controle de Capoeira</h2>
+
+<div class="card dashboard">
+<div class="box">👥 Alunos<br><span id="dAlunos">0</span></div>
+<div class="box">💰 Pagas<br><span id="dPagas">0</span></div>
+<div class="box">⚠️ Atraso<br><span id="dAtraso">0</span></div>
+<div class="box">📉 Inad<br><span id="dInad">0%</span></div>
+</div>
+
+<div class="card">
+<div id="form" class="form-box">
+<div class="form-grid">
+<input id="nome" placeholder="Nome">
+<input id="apelido" placeholder="Apelido">
+<input id="valor" type="number" placeholder="Valor">
+<input id="venc" type="date">
+<input id="meses" type="number" placeholder="Meses">
+<input id="tel" type="tel" placeholder="WhatsApp">
+
+<button type="button" class="btn form-full" onclick="addAluno()">Salvar</button>
+</div>
+</div>
+</div>
+
+<div class="card">
+<h3 style="cursor:default">💰 Mensalidades</h3>
+
+<div id="mensalidade" class="parcelas ativo">
+
+<div id="topoMensalidade">
+<div style="display:flex;gap:5px;margin-bottom:8px">
+<button class="btn" onclick="trocarAba('pendente')">Pendente</button>
+<button class="btn-warning" onclick="trocarAba('atrasado')">Atrasado</button>
+<button class="btn" onclick="trocarAba('emdia')">Em dia</button>
+</div>
+
+<input id="busca" placeholder="🔎 Buscar aluno..." oninput="render()" 
+style="margin-bottom:8px;padding:8px;border-radius:5px;border:none;width:100%">
+</div>
+
+<div id="lista"></div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="fab" onclick="toggleForm()">+</div>
+
+<script>
+const $=id=>document.getElementById(id)
+
+let alunos=JSON.parse(localStorage.getItem("alunos"))||[]
+let abaAtual="atrasado"
+
+function salvar(){localStorage.setItem("alunos",JSON.stringify(alunos))}
+
+function toggleForm(){
+let f=$("form")
+if(f) f.classList.toggle("ativo")
+}
+
+function trocarAba(a){abaAtual=a;render()}
+
+function limparForm(){
+["nome","apelido","valor","venc","meses","tel"].forEach(i=>{
+if($(i)) $(i).value=""
+})
+}
+
+function formatar(d){
+let x=new Date(d)
+return `${String(x.getDate()).padStart(2,'0')}/${String(x.getMonth()+1).padStart(2,'0')}/${x.getFullYear()}`
+}
+
+function dataBR(d){
+let [dia,mes,ano]=d.split("/")
+return new Date(ano,mes-1,dia)
+}
+
+function gerarParcelas(v,m){
+let base=new Date(v)
+let arr=[]
+for(let i=0;i<m;i++){
+let d=new Date(base)
+d.setMonth(d.getMonth()+i)
+arr.push({
+numero:i+1,
+data:formatar(d),
+pago:false
+})
+}
+return arr
+}
+
+function addAluno(){
+let nome=$("nome").value.trim()
+let apelido=$("apelido").value.trim()
+let valor=$("valor").value
+let venc=$("venc").value
+let meses=$("meses").value
+let tel=$("tel").value.trim()
+
+if(!nome || !valor || !venc || !meses){
+alert("Preencha tudo")
+return
+}
+
+alunos.push({
+nome,
+apelido,
+valor:+valor,
+tel,
+parcelas:gerarParcelas(venc,meses),
+open:false
+})
+
+salvar()
+render()
+limparForm()
+
+let f=$("form")
+if(f) f.classList.remove("ativo")
+}
+
+function toggleAluno(i){
+alunos[i].open=!alunos[i].open
+render()
+}
+
+function togglePago(i,p){
+if(!alunos[i] || !alunos[i].parcelas[p]) return
+alunos[i].parcelas[p].pago=!alunos[i].parcelas[p].pago
+salvar()
+render()
+}
+
+function cobrarAluno(i,p){
+let a=alunos[i]
+if(!a.tel) return alert("Sem WhatsApp")
+
+let num=a.tel.replace(/\D/g,'')
+if(num.length===11) num="55"+num
+if(num.length<12) return alert("Número inválido")
+
+let parcela=a.parcelas[p]
+
+let msg=`Olá, ${a.nome}! 👋
+Tudo bem?
+Identificamos que sua mensalidade ainda está em aberto. Seguem os detalhes:
+📅 Parcela: ${parcela.numero}
+📆 Vencimento: ${parcela.data}
+💰 Valor: R$ ${a.valor}
+Caso já tenha realizado o pagamento, por favor desconsidere esta mensagem.
+Se precisar de qualquer ajuda ou tiver alguma dúvida, estou à disposição 🙂`
+
+window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`)
+}
+
+function editarAluno(i){
+let a=alunos[i]
+
+$("nome").value=a.nome
+$("apelido").value=a.apelido
+$("valor").value=a.valor
+$("tel").value=a.tel
+
+$("meses").value=a.parcelas.length
+$("venc").value=""
+
+alunos.splice(i,1)
+
+let f=$("form")
+if(f) f.classList.add("ativo")
+
+salvar()
+render()
+}
+
+function excluirAluno(i){
+if(confirm("Excluir?")){
+alunos.splice(i,1)
+salvar()
+render()
+}
+}
+
+function render(){
+let lista=$("lista")
+if(!lista) return
+
+lista.innerHTML=""
+
+let termo=$("busca")?$("busca").value.toLowerCase():""
+
+let pagas=0,atraso=0
+
+alunos.forEach((a,i)=>{
+
+if(termo && !a.nome.toLowerCase().includes(termo) && !(a.apelido||"").toLowerCase().includes(termo)) return
+
+let atrasadas=a.parcelas.filter(p=>!p.pago&&dataBR(p.data)<new Date())
+let pagasArr=a.parcelas.filter(p=>p.pago)
+let pend=a.parcelas.filter(p=>!p.pago&&dataBR(p.data)>=new Date())
+
+pagas+=pagasArr.length
+atraso+=atrasadas.length
+
+let exibir=abaAtual=="pendente"?pend:abaAtual=="emdia"?pagasArr:atrasadas
+
+let html=`<div class="aluno">
+<h3 onclick="toggleAluno(${i})">${a.nome} (${a.apelido||""})</h3>
+<div class="parcelas ${a.open?'ativo':''}">`
+
+if(a.open){
+if(!exibir.length) html+=`<div style="opacity:.6">Sem parcelas</div>`
+
+exibir.forEach(p=>{
+let id=a.parcelas.findIndex(x=>x===p)
+if(id===-1) return
+
+html+=`<div class="parcela">
+<span>${p.numero} - ${p.data}</span>
+<div class="parcela-botoes">
+<button class="btn" onclick="editarAluno(${i})">Editar</button>
+<button class="btn-warning" onclick="cobrarAluno(${i},${id})">Cobrar</button>
+<button class="btn-danger" onclick="excluirAluno(${i})">Excluir</button>
+<button onclick="togglePago(${i},${id})">${p.pago?'✔':'❌'}</button>
+</div></div>`
+})
+}
+
+html+=`</div></div>`
+lista.innerHTML+=html
+})
+
+$("dAlunos").innerText=alunos.length
+$("dPagas").innerText=pagas
+$("dAtraso").innerText=atraso
+$("dInad").innerText=(pagas+atraso?((atraso/(pagas+atraso))*100).toFixed(1):0)+"%"
+}
+
+render()
+
+let lastScroll=0
+let mensalidade=$("mensalidade")
+
+if(mensalidade){
+mensalidade.addEventListener("scroll",function(){
+let atual=this.scrollTop
+let topo=$("topoMensalidade")
+if(!topo) return
+
+if(atual>lastScroll && atual>20){
+topo.classList.add("esconder")
+}else{
+topo.classList.remove("esconder")
+}
+
+lastScroll=atual
+})
+}
+</script>
+
+</body>
+</html>

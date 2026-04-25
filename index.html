@@ -294,9 +294,15 @@ let parcela=a.parcelas[p]
 let msg=`Olá, ${a.nome}! 👋
 Tudo bem?
 
+Identificamos que sua mensalidade ainda está em aberto. Seguem os detalhes:
+
 📅 Parcela: ${parcela.numero}
 📆 Vencimento: ${parcela.data}
-💰 Valor: R$ ${a.valor}`
+💰 Valor: R$ ${a.valor}
+
+Caso já tenha realizado o pagamento, por favor desconsidere esta mensagem.
+
+Se precisar de qualquer ajuda ou tiver alguma dúvida, estou à disposição 🙂`
 
 window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`)
 }

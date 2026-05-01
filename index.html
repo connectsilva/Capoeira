@@ -166,6 +166,25 @@ transform:scale(1.05);
 <div class="box">💰 Pagas<br><span id="dPagas">0</span></div>
 <div class="box">⚠️ Atraso<br><span id="dAtraso">0</span></div>
 <div class="box">📉 Inad<br><span id="dInad">0%</span></div>
+
+<!-- APPEND-ONLY: Backup -->
+<div class="box">
+<button class="btn" onclick="fazerBackup()">📦 Backup</button>
+</div>
+
+<!-- APPEND-ONLY: Restaurar -->
+<div class="box">
+<button class="btn-warning" onclick="document.getElementById('restoreFile').click()">
+📥 Restaurar
+</button>
+
+<input
+id="restoreFile"
+type="file"
+accept=".json"
+style="display:none"
+onchange="restaurarBackup(event)">
+</div>
 </div>
 
 <div class="card">
@@ -582,6 +601,64 @@ window.scrollTo({
 top:$("form").offsetTop-20,
 behavior:"smooth"
 })
+}
+
+/* APPEND-ONLY: BACKUP */
+function fazerBackup(){
+let dados={
+data:new Date().toISOString(),
+alunos:alunos
+}
+
+let blob=new Blob(
+[JSON.stringify(dados,null,2)],
+{type:"application/json"}
+)
+
+let url=URL.createObjectURL(blob)
+
+let a=document.createElement("a")
+a.href=url
+a.download=`backup-capoeira-${Date.now()}.json`
+a.click()
+
+URL.revokeObjectURL(url)
+}
+
+/* APPEND-ONLY: RESTAURAR BACKUP */
+function restaurarBackup(event){
+let arquivo=event.target.files[0]
+
+if(!arquivo) return
+
+let reader=new FileReader()
+
+reader.onload=function(e){
+try{
+let dados=JSON.parse(e.target.result)
+
+if(!dados.alunos){
+alert("Backup inválido")
+return
+}
+
+if(!confirm("Deseja restaurar o backup? Isso substituirá os dados atuais.")){
+return
+}
+
+alunos=dados.alunos
+
+salvar()
+render()
+
+alert("Backup restaurado com sucesso!")
+
+}catch{
+alert("Erro ao restaurar backup")
+}
+}
+
+reader.readAsText(arquivo)
 }
 </script>
 

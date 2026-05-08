@@ -1,38 +1,19 @@
-const CACHE_NAME = "capoeira-cache-v2";
-
-const FILES_TO_CACHE = [
-  "./",
-  "./index.html",
-  "./manifest.json",
-  "./icon.png"
+const CACHE_NAME = 'capoeira-v1';
+const ASSETS = [
+  '/',
+  'index.html',
+  'manifest.json',
+  'icon-192.png' // Adicione aqui seus ícones e outros arquivos locais
 ];
 
-self.addEventListener("install", (event) => {
-  self.skipWaiting(); // força atualização
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(FILES_TO_CACHE);
-    })
+self.addEventListener('install', (e) => {
+  e.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
 });
 
-self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key); // apaga cache antigo
-          }
-        })
-      );
-    })
-  );
-  self.clients.claim(); // assume controle imediato
-});
-
-self.addEventListener("fetch", (event) => {
-  event.respondWith(
-    fetch(event.request).catch(() => caches.match(event.request))
+self.addEventListener('fetch', (e) => {
+  e.respondWith(
+    caches.match(e.request).then((res) => res || fetch(e.request))
   );
 });

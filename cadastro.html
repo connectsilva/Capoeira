@@ -21,22 +21,25 @@
         body {
             background: var(--bg-dark);
             color: var(--text-main);
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Roboto, sans-serif;
             margin: 0;
             padding: 20px;
+            display: flex;
+            justify-content: center;
         }
 
-        .form-container {
+        .form-container, .sucesso-container {
             max-width: 500px;
-            margin: auto;
+            width: 100%;
             background: var(--card-bg);
             padding: 25px;
             border-radius: var(--radius);
             border: 1px solid var(--primary);
+            box-sizing: border-box;
         }
 
         .header { text-align: center; margin-bottom: 25px; }
-        .logo { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--primary); margin-bottom: 10px; }
+        .logo { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; margin-bottom: 10px; }
 
         label { font-size: 12px; color: var(--primary); font-weight: bold; display: block; margin-top: 15px; }
         input, select, textarea { 
@@ -44,101 +47,122 @@
             border: 1px solid #333; background: var(--input-bg); color: #fff; box-sizing: border-box;
         }
 
-        .row { display: flex; gap: 10px; }
-        .row > div { flex: 1; }
+        .row { display: flex; gap: 10px; flex-wrap: wrap; }
+        .row > div { flex: 1; min-width: 150px; }
 
         button { 
             width: 100%; padding: 15px; background: var(--primary); border: none; 
             border-radius: 8px; color: #000; font-weight: bold; margin-top: 25px; cursor: pointer;
+            transition: opacity 0.3s;
         }
 
-        #mensagemSucesso { display: none; text-align: center; padding: 40px 20px; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Estilo da Mensagem de Sucesso */
+        #mensagemSucesso { 
+            display: none; 
+            text-align: center; 
+            animation: fadeIn 0.5s;
+        }
+        .check-icon { font-size: 50px; margin-bottom: 15px; }
+        .btn-voltar { 
+            display: inline-block; margin-top: 20px; color: var(--primary); 
+            text-decoration: none; border: 1px solid var(--primary); padding: 10px 20px; border-radius: 8px;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
-<div id="areaForm">
-    <div class="form-container">
-        <div class="header">
-            <img id="profLogo" class="logo" src="https://via.placeholder.com/80">
-            <h2 id="profNomeAcad" style="margin:0">Carregando...</h2>
-            <p id="profNome" style="font-size:14px; color:#aaa"></p>
+<div id="areaForm" class="form-container">
+    <div class="header">
+        <img id="profLogo" class="logo" src="https://via.placeholder.com/80">
+        <h2 id="profNomeAcad" style="margin:0">Carregando...</h2>
+        <p id="profNome" style="font-size:14px; color:#aaa"></p>
+    </div>
+
+    <form id="cadastroForm">
+        <label>Nome Completo</label>
+        <input type="text" id="nome" required>
+
+        <div class="row">
+            <div><label>Apelido</label><input type="text" id="apelido"></div>
+            <div><label>Data de Nascimento</label><input type="date" id="nascimento" required></div>
         </div>
 
-        <form id="cadastroForm">
-            <label>Nome Completo</label>
-            <input type="text" id="nome" required>
-
-            <div class="row">
-                <div><label>Apelido</label><input type="text" id="apelido"></div>
-                <div><label>Data de Nascimento</label><input type="date" id="nascimento" required></div>
+        <div class="row">
+            <div>
+                <label>Sexo</label>
+                <select id="sexo" required>
+                    <option value="">Selecionar</option>
+                    <option value="Masculino">Masculino</option>
+                    <option value="Feminino">Feminino</option>
+                    <option value="Outro">Outro</option>
+                </select>
             </div>
+            <div><label>WhatsApp</label><input type="tel" id="tel" placeholder="(99) 99999-9999" required></div>
+        </div>
 
-            <div class="row">
-                <div><label>Sexo</label>
-                    <select id="sexo">
-                        <option value="Masculino">Masculino</option>
-                        <option value="Feminino">Feminino</option>
-                        <option value="Outro">Outro</option>
-                    </select>
-                </div>
-                <div><label>WhatsApp</label><input type="tel" id="tel" placeholder="(00) 00000-0000" required></div>
-            </div>
+        <label>Endereço Completo</label>
+        <input type="text" id="endereco" placeholder="Rua, número, bairro">
 
-            <label>Endereço Completo</label>
-            <input type="text" id="endereco" placeholder="Rua, número, bairro">
+        <label>Com quem reside?</label>
+        <input type="text" id="reside_com">
 
-            <label>Com quem reside?</label>
-            <input type="text" id="reside_com">
+        <label>Alergias ou Condições Médicas?</label>
+        <textarea id="alergia" rows="2" placeholder="Se não houver, deixe em branco"></textarea>
 
-            <label>Alergias ou Condições Médicas?</label>
-            <textarea id="alergia" rows="2" placeholder="Se não houver, deixe em branco"></textarea>
+        <label>Contato de Emergência (Telefone)</label>
+        <input type="tel" id="emergencia_fone" required>
 
-            <label>Contato de Emergência (Telefone)</label>
-            <input type="tel" id="emergencia_fone" required>
-
-            <button type="submit" id="btnEnviar">ENVIAR CADASTRO</button>
-        </form>
-    </div>
+        <button type="submit" id="btnEnviar">ENVIAR CADASTRO</button>
+    </form>
 </div>
 
-<div id="mensagemSucesso">
-    <h1 style="color: var(--primary);">💪 Axé!</h1>
-    <p>Seu cadastro foi enviado com sucesso para o professor.</p>
-    <p>Agora é só aguardar a confirmação na próxima aula!</p>
+<div id="mensagemSucesso" class="sucesso-container">
+    <div class="check-icon">🏹</div>
+    <h2 style="color: var(--primary)">Axé, tudo pronto!</h2>
+    <p>Sua ficha de inscrição foi enviada com sucesso.</p>
+    <p><strong>Seja muito bem-vindo(a) à nossa família!</strong></p>
+    <a href="javascript:location.reload()" class="btn-voltar">NOVO CADASTRO</a>
 </div>
 
 <script>
-    // Configuração idêntica à do Professor
- const firebaseConfig = {
-        apiKey: "AIzaSyAifUhJB6krANoJhGSI-CBYOCElm-QLa1Y",
-        authDomain: "capoeira-oficial-b7421.firebaseapp.com",
-        databaseURL: "https://capoeira-oficial-b7421-default-rtdb.firebaseio.com",
-        projectId: "capoeira-oficial-b7421",
-        storageBucket: "capoeira-oficial-b7421.firebasestorage.app",
-        messagingSenderId: "1020091949434",
-        appId: "1:1020091949434:web:6a1bc84179c9f99a76b6c3",
-        measurementId: "G-ZCCXZ44Q50"
-    };  
+    const firebaseConfig = {
+        apiKey: "AIzaSyBaR3l4VXYRIHyvcyqMco6Sy4_-eYGpR8g",
+        authDomain: "teste02-ce0d2.firebaseapp.com",
+        projectId: "teste02-ce0d2",
+        storageBucket: "teste02-ce0d2.firebasestorage.app",
+        messagingSenderId: "389717337129",
+        appId: "1:389717337129:web:fdc718e47ff6ea73f96838"
+    };    
     
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // Captura o UID do professor pela URL (?ref=UID_DO_PROFESSOR)
     const urlParams = new URLSearchParams(window.location.search);
     const profUid = urlParams.get('ref');
 
     async function carregarDadosProfessor() {
         if(!profUid) {
-            alert("Link inválido! Peça o link correto ao seu professor.");
+            document.getElementById('profNomeAcad').innerText = "Erro: Link sem referência";
             return;
         }
-        const doc = await db.collection('users').doc(profUid).get();
-        if(doc.exists) {
-            const data = doc.data();
-            document.getElementById('profNomeAcad').innerText = data.config.nome;
-            document.getElementById('profNome').innerText = data.config.prof;
-            document.getElementById('profLogo').src = data.config.logo;
+        try {
+            const doc = await db.collection('users').doc(profUid).get();
+            if(doc.exists) {
+                const data = doc.data();
+                if(data.config) {
+                    document.getElementById('profNomeAcad').innerText = data.config.nome || "Academia";
+                    document.getElementById('profNome').innerText = data.config.prof || "";
+                    document.getElementById('profLogo').src = data.config.logo || "https://via.placeholder.com/80";
+                }
+            } else {
+                alert("Professor não encontrado!");
+            }
+        } catch (e) {
+            console.error(e);
         }
     }
 
@@ -149,6 +173,7 @@
         btn.innerText = "Enviando...";
 
         const novoAluno = {
+            id: Date.now(), // Adicionado ID único para o aluno
             nome: document.getElementById('nome').value,
             apelido: document.getElementById('apelido').value,
             nascimento: document.getElementById('nascimento').value,
@@ -158,24 +183,25 @@
             reside_com: document.getElementById('reside_com').value,
             alergia: document.getElementById('alergia').value,
             emergencia_fone: document.getElementById('emergencia_fone').value,
-            valor: 0, // Professor define depois
-            parcelas: [], // Gerado pelo professor ao ativar
+            dataCadastro: new Date().toISOString(),
+            status: "pendente",
+            valor: 0,
+            parcelas: [],
             foto: ""
         };
 
         try {
             const docRef = db.collection('users').doc(profUid);
-            const doc = await docRef.get();
-            const data = doc.data();
-            let listaAlunos = data.alunos || [];
             
-            listaAlunos.push(novoAluno);
-            
-            await docRef.update({ alunos: listaAlunos });
+            // O uso de arrayUnion evita que um aluno sobrescreva o outro
+            await docRef.update({
+                alunos: firebase.firestore.FieldValue.arrayUnion(novoAluno)
+            });
             
             document.getElementById('areaForm').style.display = 'none';
             document.getElementById('mensagemSucesso').style.display = 'block';
         } catch (error) {
+            console.error("Erro ao salvar:", error);
             alert("Erro ao enviar cadastro. Tente novamente.");
             btn.disabled = false;
             btn.innerText = "ENVIAR CADASTRO";

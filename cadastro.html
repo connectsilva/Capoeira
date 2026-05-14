@@ -203,10 +203,13 @@ async function buscarNomeProfessor() {
         }
     } catch (error) {
         console.error("Erro ao buscar professor:", error);
-        document.getElementById('nomeProfessor').innerText = "";
+        document.getElementById('nomeProfessor').innerText = "Erro ao carregar perfil";
     }
 }
 
+// ESTA LINHA É O QUE FALTAVA: Chama a função assim que o script carrega
+buscarNomeProfessor(); 
+</script>
     function previewImg(input) {
         if (input.files && input.files[0]) {
             const reader = new FileReader();

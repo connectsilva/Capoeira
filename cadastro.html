@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de Aluno - Capoeira Control</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -15,159 +15,102 @@
             --card-bg: #161616;
             --input-bg: #252525;
             --text-main: #ffffff;
-            --text-dim: #aaa;
+            --radius: 12px;
         }
 
-        body { 
-            background: var(--bg-dark); 
-            color: var(--text-main); 
-            font-family: sans-serif; 
-            display: flex; justify-content: center; align-items: flex-start; padding: 20px;
-            margin: 0; min-height: 100vh;
+        body {
+            background: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
         }
 
-        .form-card { 
-            background: var(--card-bg); 
-            padding: 25px; 
-            border-radius: 15px; 
-            border: 1px solid var(--primary); 
-            width: 100%; max-width: 500px; 
+        .form-container {
+            max-width: 500px;
+            margin: auto;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: var(--radius);
+            border: 1px solid var(--primary);
         }
 
-        label { color: var(--primary); font-size: 12px; font-weight: bold; display: block; margin-top: 15px; }
+        .header { text-align: center; margin-bottom: 25px; }
+        .logo { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--primary); margin-bottom: 10px; }
+
+        label { font-size: 12px; color: var(--primary); font-weight: bold; display: block; margin-top: 15px; }
         input, select, textarea { 
-            width: 100%; padding: 12px; margin-top: 5px; box-sizing: border-box;
-            background: var(--input-bg); border: 1px solid #333; 
-            color: #fff; border-radius: 8px; font-size: 16px;
+            width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; 
+            border: 1px solid #333; background: var(--input-bg); color: #fff; box-sizing: border-box;
         }
 
-        .photo-area { text-align: center; margin-bottom: 20px; }
-        #preview {
-            width: 100px; height: 100px; border-radius: 50%;
-            border: 2px dashed var(--primary); object-fit: cover; margin-bottom: 10px;
-        }
+        .row { display: flex; gap: 10px; }
+        .row > div { flex: 1; }
 
         button { 
-            width: 100%; padding: 15px; background: var(--primary); 
-            border: none; border-radius: 8px; font-weight: bold; color: #000;
-            margin-top: 25px; cursor: pointer; font-size: 16px;
+            width: 100%; padding: 15px; background: var(--primary); border: none; 
+            border-radius: 8px; color: #000; font-weight: bold; margin-top: 25px; cursor: pointer;
         }
 
-        #sucesso {
-            display: none;
-            text-align: center;
-            background: var(--card-bg);
-            padding: 40px 20px;
-            border-radius: 20px;
-            border: 1px solid var(--primary);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            max-width: 400px;
-            width: 100%;
-            animation: fadeIn 0.5s ease forwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .check-icon { font-size: 60px; margin-bottom: 20px; }
-        .sucesso-titulo { font-size: 24px; font-weight: bold; color: #fff; margin-bottom: 10px; }
-        .sucesso-texto { color: var(--text-dim); line-height: 1.6; margin-bottom: 30px; }
-        
-        .btn-voltar {
-            display: inline-block;
-            background: transparent;
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            padding: 12px 30px;
-            border-radius: 30px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-        .btn-voltar:hover { background: var(--primary); color: #000; }
+        #mensagemSucesso { display: none; text-align: center; padding: 40px 20px; }
     </style>
 </head>
 <body>
 
-<div class="form-card" id="formContainer">
-    <h2 style="text-align:center; color:var(--primary); margin-top: 0;">Ficha de Inscrição</h2>
-    <p id="nomeProfessor" style="text-align:center; color:#fff; font-weight:bold; margin-top:-10px; font-size:16px; opacity:0.8">Carregando professor...</p>
-    <p style="text-align:center; font-size: 14px; color: var(--text-dim);">Preencha todos os dados abaixo</p>
+<div id="areaForm">
+    <div class="form-container">
+        <div class="header">
+            <img id="profLogo" class="logo" src="https://via.placeholder.com/80">
+            <h2 id="profNomeAcad" style="margin:0">Carregando...</h2>
+            <p id="profNome" style="font-size:14px; color:#aaa"></p>
+        </div>
 
-    <div class="photo-area">
-        <img id="preview" src="https://via.placeholder.com/100">
-        <input type="file" id="foto" accept="image/*" onchange="previewImg(this)" style="display:none">
-        <button type="button" onclick="document.getElementById('foto').click()" style="margin-top:0; padding:8px; background:#333; color:#fff; font-size:11px; width: auto;">ADICIONAR FOTO</button>
+        <form id="cadastroForm">
+            <label>Nome Completo</label>
+            <input type="text" id="nome" required>
+
+            <div class="row">
+                <div><label>Apelido</label><input type="text" id="apelido"></div>
+                <div><label>Data de Nascimento</label><input type="date" id="nascimento" required></div>
+            </div>
+
+            <div class="row">
+                <div><label>Sexo</label>
+                    <select id="sexo">
+                        <option value="Masculino">Masculino</option>
+                        <option value="Feminino">Feminino</option>
+                        <option value="Outro">Outro</option>
+                    </select>
+                </div>
+                <div><label>WhatsApp</label><input type="tel" id="tel" placeholder="(00) 00000-0000" required></div>
+            </div>
+
+            <label>Endereço Completo</label>
+            <input type="text" id="endereco" placeholder="Rua, número, bairro">
+
+            <label>Com quem reside?</label>
+            <input type="text" id="reside_com">
+
+            <label>Alergias ou Condições Médicas?</label>
+            <textarea id="alergia" rows="2" placeholder="Se não houver, deixe em branco"></textarea>
+
+            <label>Contato de Emergência (Telefone)</label>
+            <input type="tel" id="emergencia_fone" required>
+
+            <button type="submit" id="btnEnviar">ENVIAR CADASTRO</button>
+        </form>
     </div>
-
-    <label>Nome Completo</label>
-    <input id="nome" placeholder="Seu nome completo">
-
-    <label>Apelido (Capoeira)</label>
-    <input id="apelido" placeholder="Como é conhecido">
-
-    <label>Data de Nascimento</label>
-    <input id="nascimento" type="date">
-
-    <label>Sexo</label>
-    <select id="sexo">
-        <option value="Masculino">Masculino</option>
-        <option value="Feminino">Feminino</option>
-    </select>
-
-    <label>WhatsApp</label>
-    <input id="tel" type="tel" placeholder="(99) 99999-9999">
-
-    <label>CEP</label>
-    <input id="cep" placeholder="00000-000">
-
-    <label>Cidade</label>
-    <input id="cidade">
-
-    <label>Bairro</label>
-    <input id="bairro">
-
-    <label>Mora com quem?</label>
-    <input id="reside_com" placeholder="Ex: Pais, Esposa, Sozinho">
-
-    <label>Nome do Responsável (se menor)</label>
-    <input id="resp_nome">
-
-    <label>Telefone de Emergência</label>
-    <input id="emergencia_fone" placeholder="(99) 99999-9999">
-
-    <label>Possui Alergia?</label>
-    <textarea id="alergia" rows="2" placeholder="Se sim, quais?"></textarea>
-
-    <label>Toma algum Remédio?</label>
-    <textarea id="remedio" rows="2" placeholder="Se sim, quais?"></textarea>
-
-    <label>Restrição Médica ou Física?</label>
-    <textarea id="restricao" rows="2" placeholder="Ex: Problema no joelho"></textarea>
-
-    <label>Autoriza saída desacompanhado? (Menores)</label>
-    <select id="autoriza_saida">
-        <option value="Sim">Sim</option>
-        <option value="Não">Não</option>
-    </select>
-
-    <button onclick="enviarCadastro()">FINALIZAR INSCRIÇÃO</button>
 </div>
 
-<div id="sucesso">
-    <div class="check-icon">🏹</div>
-    <h2 class="sucesso-titulo">Axé, tudo pronto!</h2>
-    <p class="sucesso-texto">
-        Sua ficha de inscrição foi enviada com sucesso para o sistema do professor.<br>
-        <strong>Seja muito bem-vindo(a) à nossa família!</strong>
-    </p>
-    <a href="javascript:location.reload()" class="btn-voltar">FECHAR</a>
+<div id="mensagemSucesso">
+    <h1 style="color: var(--primary);">💪 Axé!</h1>
+    <p>Seu cadastro foi enviado com sucesso para o professor.</p>
+    <p>Agora é só aguardar a confirmação na próxima aula!</p>
 </div>
 
 <script>
-    const firebaseConfig = {
+    // Configuração idêntica à do Professor
+ const firebaseConfig = {
         apiKey: "AIzaSyAifUhJB6krANoJhGSI-CBYOCElm-QLa1Y",
         authDomain: "capoeira-oficial-b7421.firebaseapp.com",
         databaseURL: "https://capoeira-oficial-b7421-default-rtdb.firebaseio.com",
@@ -177,98 +120,69 @@
         appId: "1:1020091949434:web:6a1bc84179c9f99a76b6c3",
         measurementId: "G-ZCCXZ44Q50"
     };  
-
+    
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
+    // Captura o UID do professor pela URL (?ref=UID_DO_PROFESSOR)
     const urlParams = new URLSearchParams(window.location.search);
-    const profUID = urlParams.get('ref');
+    const profUid = urlParams.get('ref');
 
-    async function buscarNomeProfessor() {
-        if (!profUID) {
-            document.getElementById('nomeProfessor').innerText = "Link Inválido";
+    async function carregarDadosProfessor() {
+        if(!profUid) {
+            alert("Link inválido! Peça o link correto ao seu professor.");
             return;
         }
-        try {
-            const doc = await db.collection('users').doc(profUID).get();
-            if (doc.exists && doc.data().nome) {
-                document.getElementById('nomeProfessor').innerText = "Professor: " + doc.data().nome;
-            } else {
-                document.getElementById('nomeProfessor').innerText = "Professor não encontrado";
-            }
-        } catch (error) {
-            console.error("Erro ao buscar professor:", error);
-            document.getElementById('nomeProfessor').innerText = "Erro ao carregar perfil";
+        const doc = await db.collection('users').doc(profUid).get();
+        if(doc.exists) {
+            const data = doc.data();
+            document.getElementById('profNomeAcad').innerText = data.config.nome;
+            document.getElementById('profNome').innerText = data.config.prof;
+            document.getElementById('profLogo').src = data.config.logo;
         }
     }
 
-    function previewImg(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = e => document.getElementById('preview').src = e.target.result;
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    async function enviarCadastro() {
-        if(!profUID) return alert("Erro: Link inválido. Peça um novo link ao seu professor.");
-        
-        const nome = document.getElementById('nome').value;
-        if(!nome) return alert("Por favor, preencha seu nome.");
-
-        const btn = document.querySelector('button');
-        const originalText = btn.innerText;
-        btn.innerText = "ENVIANDO...";
+    document.getElementById('cadastroForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btnEnviar');
         btn.disabled = true;
+        btn.innerText = "Enviando...";
+
+        const novoAluno = {
+            nome: document.getElementById('nome').value,
+            apelido: document.getElementById('apelido').value,
+            nascimento: document.getElementById('nascimento').value,
+            sexo: document.getElementById('sexo').value,
+            tel: document.getElementById('tel').value,
+            endereco: document.getElementById('endereco').value,
+            reside_com: document.getElementById('reside_com').value,
+            alergia: document.getElementById('alergia').value,
+            emergencia_fone: document.getElementById('emergencia_fone').value,
+            valor: 0, // Professor define depois
+            parcelas: [], // Gerado pelo professor ao ativar
+            foto: ""
+        };
 
         try {
-            const docRef = db.collection('users').doc(profUID);
+            const docRef = db.collection('users').doc(profUid);
             const doc = await docRef.get();
+            const data = doc.data();
+            let listaAlunos = data.alunos || [];
             
-            if (!doc.exists) throw new Error("Professor não encontrado.");
-
-            const dadosProf = doc.data();
-            const listaAlunos = dadosProf.alunos || [];
-
-            const novoAluno = {
-                nome: nome,
-                apelido: document.getElementById('apelido').value,
-                nascimento: document.getElementById('nascimento').value,
-                sexo: document.getElementById('sexo').value,
-                tel: document.getElementById('tel').value,
-                cep: document.getElementById('cep').value,
-                cidade: document.getElementById('cidade').value,
-                bairro: document.getElementById('bairro').value,
-                reside_com: document.getElementById('reside_com').value,
-                resp_nome: document.getElementById('resp_nome').value,
-                emergencia_fone: document.getElementById('emergencia_fone').value,
-                alergia: document.getElementById('alergia').value,
-                remedio: document.getElementById('remedio').value,
-                restricao: document.getElementById('restricao').value,
-                autoriza_saida: document.getElementById('autoriza_saida').value,
-                foto: document.getElementById('preview').src,
-                valor: "0",
-                parcelas: [],
-                aberto: false
-            };
-
             listaAlunos.push(novoAluno);
+            
             await docRef.update({ alunos: listaAlunos });
-
-            document.getElementById('formContainer').style.display = 'none';
-            document.getElementById('sucesso').style.display = 'block';
-
+            
+            document.getElementById('areaForm').style.display = 'none';
+            document.getElementById('mensagemSucesso').style.display = 'block';
         } catch (error) {
-            console.error(error);
-            alert("Erro ao enviar: " + error.message);
-            btn.innerText = originalText;
+            alert("Erro ao enviar cadastro. Tente novamente.");
             btn.disabled = false;
+            btn.innerText = "ENVIAR CADASTRO";
         }
-    }
+    };
 
-    // Inicialização
-    buscarNomeProfessor();
+    carregarDadosProfessor();
 </script>
-
 </body>
 </html>

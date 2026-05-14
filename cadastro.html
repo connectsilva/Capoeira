@@ -53,7 +53,6 @@
             margin-top: 25px; cursor: pointer; font-size: 16px;
         }
 
-        /* --- Estilo da Tela de Sucesso --- */
         #sucesso {
             display: none;
             text-align: center;
@@ -92,11 +91,10 @@
 </head>
 <body>
 
-<!-- CONTAINER DO FORMULÁRIO -->
 <div class="form-card" id="formContainer">
     <h2 style="text-align:center; color:var(--primary); margin-top: 0;">Ficha de Inscrição</h2>
-<p id="nomeProfessor" style="text-align:center; color:#fff; font-weight:bold; margin-top:-10px; font-size:16px; opacity:0.8">Carregando professor...</p>
-<p style="text-align:center; font-size: 14px; color: var(--text-dim);">Preencha todos os dados abaixo</p>
+    <p id="nomeProfessor" style="text-align:center; color:#fff; font-weight:bold; margin-top:-10px; font-size:16px; opacity:0.8">Carregando professor...</p>
+    <p style="text-align:center; font-size: 14px; color: var(--text-dim);">Preencha todos os dados abaixo</p>
 
     <div class="photo-area">
         <img id="preview" src="https://via.placeholder.com/100">
@@ -158,7 +156,6 @@
     <button onclick="enviarCadastro()">FINALIZAR INSCRIÇÃO</button>
 </div>
 
-<!-- TELA DE SUCESSO -->
 <div id="sucesso">
     <div class="check-icon">🏹</div>
     <h2 class="sucesso-titulo">Axé, tudo pronto!</h2>
@@ -170,16 +167,16 @@
 </div>
 
 <script>
-   const firebaseConfig = {
-  apiKey: "AIzaSyAifUhJB6krANoJhGSI-CBYOCElm-QLa1Y",
-  authDomain: "capoeira-oficial-b7421.firebaseapp.com",
-  databaseURL: "https://capoeira-oficial-b7421-default-rtdb.firebaseio.com",
-  projectId: "capoeira-oficial-b7421",
-  storageBucket: "capoeira-oficial-b7421.firebasestorage.app",
-  messagingSenderId: "1020091949434",
-  appId: "1:1020091949434:web:6a1bc84179c9f99a76b6c3",
-  measurementId: "G-ZCCXZ44Q50"
-};  
+    const firebaseConfig = {
+        apiKey: "AIzaSyAifUhJB6krANoJhGSI-CBYOCElm-QLa1Y",
+        authDomain: "capoeira-oficial-b7421.firebaseapp.com",
+        databaseURL: "https://capoeira-oficial-b7421-default-rtdb.firebaseio.com",
+        projectId: "capoeira-oficial-b7421",
+        storageBucket: "capoeira-oficial-b7421.firebasestorage.app",
+        messagingSenderId: "1020091949434",
+        appId: "1:1020091949434:web:6a1bc84179c9f99a76b6c3",
+        measurementId: "G-ZCCXZ44Q50"
+    };  
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
@@ -187,29 +184,24 @@
     const urlParams = new URLSearchParams(window.location.search);
     const profUID = urlParams.get('ref');
 
-// Função para buscar o nome do professor assim que a página abre
-async function buscarNomeProfessor() {
-    if (!profUID) {
-        document.getElementById('nomeProfessor').innerText = "Link Inválido";
-        return;
-    }
-
-    try {
-        const doc = await db.collection('users').doc(profUID).get();
-        if (doc.exists && doc.data().nome) {
-            document.getElementById('nomeProfessor').innerText = "Professor: " + doc.data().nome;
-        } else {
-            document.getElementById('nomeProfessor').innerText = "Professor não encontrado";
+    async function buscarNomeProfessor() {
+        if (!profUID) {
+            document.getElementById('nomeProfessor').innerText = "Link Inválido";
+            return;
         }
-    } catch (error) {
-        console.error("Erro ao buscar professor:", error);
-        document.getElementById('nomeProfessor').innerText = "Erro ao carregar perfil";
+        try {
+            const doc = await db.collection('users').doc(profUID).get();
+            if (doc.exists && doc.data().nome) {
+                document.getElementById('nomeProfessor').innerText = "Professor: " + doc.data().nome;
+            } else {
+                document.getElementById('nomeProfessor').innerText = "Professor não encontrado";
+            }
+        } catch (error) {
+            console.error("Erro ao buscar professor:", error);
+            document.getElementById('nomeProfessor').innerText = "Erro ao carregar perfil";
+        }
     }
-}
 
-// ESTA LINHA É O QUE FALTAVA: Chama a função assim que o script carrega
-buscarNomeProfessor(); 
-</script>
     function previewImg(input) {
         if (input.files && input.files[0]) {
             const reader = new FileReader();
@@ -273,6 +265,10 @@ buscarNomeProfessor();
             btn.disabled = false;
         }
     }
+
+    // Inicialização
+    buscarNomeProfessor();
 </script>
+
 </body>
 </html>

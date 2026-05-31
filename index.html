@@ -170,6 +170,8 @@
             <input type="file" id="cfgFileLogo" hidden onchange="previewImg(this,'cfgLogoPreview')">
             <label>Nome Academia</label><input id="cfgNome">
             <label>Professor</label><input id="cfgProf">
+            <label>E-mail para Receber Inscrições</label>
+            <input id="cfgEmailInscricoes" type="email" placeholder="exemplo@email.com">
             <label>Link de Cadastro (Novos Alunos)</label>
             <div style="display:flex; gap:5px; margin-top:5px">
                 <input id="linkCadastro" readonly style="font-size:10px; background:#111">
@@ -427,7 +429,14 @@
 
     let alunos = [];
     const MENSAGEM_PADRAO = "Olá, [nome]! 👋\nTudo bem?\n\nIdentificamos que sua mensalidade ainda está em aberto. Seguem os detalhes:\n\n📆 Vencimento: [data]\n💰 Valor: R$ [valor]\n🔑 Chave Pix para pagamento: [pix]\n\nCaso já tenha realizado o pagamento, por favor desconsidere esta mensagem.\n\nSe precisar de qualquer ajuda ou tiver alguma dúvida, estou à disposição 🙂";
-    let config = { nome: "Academia Capoeira", prof: "Professor", pix: "", logo: "https://via.placeholder.com/80", msg: MENSAGEM_PADRAO };
+let config = {
+    nome: "Academia Capoeira",
+    prof: "Professor",
+    emailInscricoes: "",
+    pix: "",
+    logo: "https://via.placeholder.com/80",
+    msg: MENSAGEM_PADRAO
+};
     let abaAtual = 'pago';
     let salvando = false;
     const saudeState = { alergia: false, condicao: false, remedio: false, restricao: false };
@@ -585,6 +594,7 @@
         $("logoTopo").src = config.logo; $("loginLogoImg").src = config.logo;
         $("loginNomeAcad").innerText = config.nome; $("loginNomeProf").innerText = config.prof;
         $("cfgNome").value = config.nome; $("cfgProf").value = config.prof;
+        $("cfgEmailInscricoes").value = config.emailInscricoes || "";
         $("cfgPix").value = config.pix; $("cfgMsg").value = config.msg;
         $("cfgLogoPreview").src = config.logo;
         const uid = auth.currentUser.uid;
@@ -920,8 +930,8 @@
     function salvarConfig() {
         config.nome = $("cfgNome").value.trim() || config.nome;
         config.prof = $("cfgProf").value.trim() || config.prof;
-        config.pix = $("cfgPix").value.trim();
-        config.msg = $("cfgMsg").value || MENSAGEM_PADRAO;
+        config.emailInscricoes = $("cfgEmailInscricoes").value.trim();
+        config.pix = $("cfgPix").value.trim();        config.msg = $("cfgMsg").value ||                          MENSAGEM_PADRAO;
         config.logo = $("cfgLogoPreview").src;
         sincronizar().then(() => toggleSettings());
     }
